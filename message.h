@@ -10,7 +10,7 @@ private:
 
 public:
     //Создание сообщения с заданными параметрами
-    Message(const std::string &from, std::string &to, std::string &text)
+    Message(const std::string &from, const std::string &to, const std::string &text)
     : m_from(from), m_to(to), m_text(text)
     {}
 
