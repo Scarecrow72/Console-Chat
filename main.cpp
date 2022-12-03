@@ -1,4 +1,3 @@
-#include <iostream>
 #include "chat.h"
 
 int main()
@@ -7,7 +6,7 @@ int main()
     while(chat.is_chat_work())
     {
         chat.show_start_menu();
-        if(chat.get_autorisation())
+        if(chat.get_authorisation())
         {
             chat.show_user_menu();
         }

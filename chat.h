@@ -4,7 +4,7 @@
 #include <exception>
 #include <vector>
 #include <memory>
-//#include <array>
+#include <unordered_map>
 
 //Ошибка регистрации. Пользователь с таким логином уже существует
 class MatchLoginExc: public std::exception
@@ -40,13 +40,14 @@ class Chat
 {
 private:
     bool m_start {true};
-    bool m_autorisation {false};
-    std::vector <User> m_users;
+    bool m_authorisation {false};
+    std::string login;
+    std::unordered_map <std::string, User> m_users;
     std::vector <Message> m_messages;
     std::unique_ptr <User> m_current_user;
 
     void registration();
-    void autorisation();
+    void authorisation();
     void set_current_user(const User& autorised);
     void create_message();
     void show_users() const;
@@ -54,8 +55,9 @@ private:
     void escape();
             
 public:
-    bool get_autorisation() const;
+    bool get_authorisation() const;
     bool is_chat_work() const;
     void show_start_menu();
-    void show_user_menu();    
+    void show_user_menu();
+    ~Chat();    
 };
