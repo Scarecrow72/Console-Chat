@@ -2,6 +2,8 @@
 #include <string>
 #include <cstring>
 
+typedef unsigned int uint;
+
 class User
 {
 private:

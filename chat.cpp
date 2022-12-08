@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include "SHA-1.h"
 
+typedef unsigned int uint;
+
 //Выход из программы
 void Chat::escape()
 {
