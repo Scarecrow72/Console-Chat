@@ -1,5 +1,6 @@
 #include "chat.h"
 #include "user.h"
+#include <iomanip>
 #include <iostream>
 #include <vector>
 #include <exception>
@@ -8,8 +9,33 @@
 #include <string>
 #include <unordered_map>
 #include "SHA-1.h"
+#include <fstream>
+#include <filesystem>
 
-typedef unsigned int uint;
+namespace fs = std::filesystem;
+
+//Конструктор
+Chat::Chat()
+{
+    std::ifstream f_users("users.log");
+    if(f_users.is_open())
+    {
+        while(!f_users.eof())
+        {
+            std::string user_login;
+            uint user_pass[5];
+            std::string user_name;
+            f_users >> user_login;
+            if(user_login.empty())
+                break;
+            for(int i = 0; i < 5; ++i)
+                f_users >> user_pass[i];
+            f_users >> user_name;
+            m_users.insert({user_login, User(user_name, user_pass, user_login)});
+        }
+    }
+    f_users.close();
+}
 
 //Выход из программы
 void Chat::escape()
@@ -282,7 +308,15 @@ void Chat::create_message()
         std::cout << "Введите текст сообщения: ";
         std::string text;
         std::getline(std::cin, text);
-        m_messages.push_back(Message((*m_current_user).get_login(), address, text));
+        //m_messages.push_back(Message((*m_current_user).get_login(), address, text));
+        std::ofstream f_messages("messages.log", std::ios::app);
+        f_messages.seekp(0, std::ios::end);  
+        if (f_messages.tellp() == 0)
+        {
+            fs::permissions("messages.log", fs::perms::none);
+            fs::permissions("messages.log", fs::perms::owner_read | fs::perms::owner_write);
+        }
+        f_messages << (*m_current_user).get_login() << " " << address << " " << text << std::endl;
     }
 }
 
@@ -301,8 +335,15 @@ void Chat::show_users() const
 //Функция просмотра сообщений
 void Chat::show_messages() const
 {
-    for(auto &message : m_messages)
+    std::ifstream f_message("messages.log");
+    while(!f_message.eof())
     {
+        std::string from, to, text;
+        f_message >> from >> to;
+        if(from.empty())
+            break;
+        std::getline (f_message, text);
+        Message message(from, to, text);
         //Проверка уровня доступа к сообщениям в чате если сообщение лично или если сообщение в общем чате
         if(message.get_to() == (*m_current_user).get_login() || message.get_to() == "ALL")
         {
@@ -467,6 +508,22 @@ void Chat::show_user_menu()
 
 Chat::~Chat()
 {
-    for(auto elem : m_users)
-        delete[] elem.second.get_password();
+    if(!m_users.empty())
+    {        
+        std::ofstream f_users("users.log");
+        f_users.seekp(0, std::ios::end);  
+        if (f_users.tellp() == 0)
+        {
+            fs::permissions("users.log", fs::perms::none);
+            fs::permissions("users.log", fs::perms::owner_read | fs::perms::owner_write);
+        }
+        for(auto elem : m_users)
+        {
+            f_users << elem.second.get_login() << " ";
+            for(int i = 0; i < 5; ++i)
+                f_users << (elem.second.get_password())[i] << " ";
+            f_users << elem.second.get_name() << std::endl;
+            delete[] elem.second.get_password();
+        }
+    }
 }

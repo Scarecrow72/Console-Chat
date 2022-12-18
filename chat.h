@@ -43,7 +43,8 @@ private:
     bool m_authorisation {false};
     std::string login;
     std::unordered_map <std::string, User> m_users;
-    std::vector <Message> m_messages;
+    //Нужен ли будет в дальнейшем этот массив????
+    //std::vector <Message> m_messages; 
     std::unique_ptr <User> m_current_user;
 
     void registration();
@@ -55,6 +56,7 @@ private:
     void escape();
             
 public:
+    Chat();
     bool get_authorisation() const;
     bool is_chat_work() const;
     void show_start_menu();
